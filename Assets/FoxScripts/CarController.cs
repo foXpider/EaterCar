@@ -22,6 +22,18 @@ public class CarController : MonoBehaviour
     public bool isBraking = false;
 
 
+    public float laneSwitchRate = 0f;
+    public float switchChancePerSecond;
+
+    public float targetLaneXCoord;
+
+    public bool leftLane = true;
+    public bool isChangingLane = false;
+    public float laneSwitchSpeed = 1f;
+
+    GameObject fakeMouth;
+
+
     public void toggleBrakes()
     {
         if(isBraking)
@@ -44,7 +56,12 @@ public class CarController : MonoBehaviour
         //thisRigid = GetComponent<Rigidbody>();
         thisTransform = GetComponent<Transform>();
         anim= GetComponentInChildren<Animator>();
+        if(switchChancePerSecond!=0)
+        {
+            laneSwitchRate = switchChancePerSecond / 60f;
+        }
         //skidder = GameObject.FindGameObjectWithTag("Skids").GetComponent<Skidmarks>();
+        fakeMouth = GameObject.FindGameObjectWithTag("FakeTopMouth");
     }
 
     //Öndeki arabayý tespit etmeyle ýsýrma arasýnda geçen takip boyunca öndeki arabanýn hýzýnda ilerliyoruz.
@@ -82,16 +99,21 @@ public class CarController : MonoBehaviour
         {
             MMVibrationManager.Haptic(HapticTypes.Warning);
         }
-
-
     }
 
     //yaða basýnca kaymak
     public void Skid()
     {
-        SlowDownForChew(2f, 2f,4);
+
+        fakeMouth.SetActive(false);
+        SlowDownForChew(2f, 1f,4);
         anim.Play("MonsterSkid");
 
+    }
+
+    public void EndSkid()
+    {
+        fakeMouth.SetActive(true);
     }
 
     public void ReturnToCruise()
@@ -109,11 +131,61 @@ public class CarController : MonoBehaviour
         }
     }
 
+    public void ChangeLane()
+    {
+        if(leftLane)
+        {
+            targetLaneXCoord = Random.Range(1f, 3f);
+        }
+        else
+        {
+            targetLaneXCoord = Random.Range(-3f, -1f);
+        }
+        isChangingLane = true;
+    }
+
 
 
     // Update is called once per frame
     void Update()
     {
+        if(!isPlayer)
+        {
+            if(laneSwitchRate>0f)
+            {
+                if(!isChangingLane)
+                {
+                    float dice = Random.Range(0f, 100f);
+                    if (dice < laneSwitchRate)
+                    {
+                        ChangeLane();
+                    }
+                }
+                
+            }
+        }
+        if(isChangingLane)
+        {
+            if(leftLane)
+            {
+                transform.position = new Vector3(transform.position.x + (laneSwitchSpeed * Time.deltaTime), transform.position.y, transform.position.z);
+                if(transform.position.x>targetLaneXCoord)
+                {
+                    isChangingLane = false;
+                    leftLane = false;
+                }
+            }
+            else
+            {
+                transform.position = new Vector3(transform.position.x - (laneSwitchSpeed * Time.deltaTime), transform.position.y, transform.position.z);
+                if (transform.position.x < targetLaneXCoord)
+                {
+                    isChangingLane = false;
+                    leftLane = true;
+                }
+            }
+        }
+
         if(!isBraking)
         {
             if (!isSlowDown && !isStalking)

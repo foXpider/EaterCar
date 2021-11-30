@@ -5,6 +5,8 @@ using UnityEngine;
 public class FinalMouthMechanic : MonoBehaviour
 {
     public Transform mouthPiece;
+    public GameObject fakeMouth;
+
     Quaternion mouthStartRotation;
     Quaternion mouthFullOpenRotation;
     public GameObject fullOpenMouthIndicator;
@@ -23,7 +25,7 @@ public class FinalMouthMechanic : MonoBehaviour
 
     public bool isPlayer = false;
 
-    bool isGameOver = false;
+    public bool isGameOver = false;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +35,10 @@ public class FinalMouthMechanic : MonoBehaviour
         if(!isPlayer)
         {
             mouthScore += baseBossMouthScore;
+        }
+        if(isPlayer)
+        {
+            fakeMouth.SetActive(false);
         }
     }
 
@@ -50,6 +56,7 @@ public class FinalMouthMechanic : MonoBehaviour
     public void CloseMouth()
     {
         mouthPiece.rotation = mouthStartRotation;
+        isGameOver = true;
     }
 
 

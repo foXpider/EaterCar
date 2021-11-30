@@ -90,6 +90,7 @@ public class EaterCarManager : MonoBehaviour
             if (GameObject.FindGameObjectWithTag("PreCanvas") != null)
             {
                 GameObject.FindGameObjectWithTag("PreCanvas").gameObject.SetActive(true);
+                GameObject.FindGameObjectWithTag("LevelStartScreen").gameObject.SetActive(false);
             }
         }
     }
@@ -148,6 +149,7 @@ public class EaterCarManager : MonoBehaviour
             g.SetActive(false);
         }
         playerCar.toggleBrakes();
+        
 
     }
 

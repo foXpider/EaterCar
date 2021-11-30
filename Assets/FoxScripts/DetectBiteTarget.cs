@@ -20,13 +20,19 @@ public class DetectBiteTarget : MonoBehaviour
     public GameObject bossDestroyed;
 
     public GameObject bossToDisable;
-    public GameObject playerToDisable;
+    public Renderer[] playerToDisable;
     CinemachineVirtualCamera runCam;
 
     public GameObject victoryScreen;
     public GameObject loseScreen;
     public GameObject bossBattleUI;
     Animator playerAnim;
+
+    CarController playerControl;
+
+    public bool playerVictory = false;
+    public bool finalCountDown = false;
+    public float finalCount = 2f;
 
 
 
@@ -38,10 +44,18 @@ public class DetectBiteTarget : MonoBehaviour
             targetSpeed = other.transform.root.GetComponent<CarController>().speed;
             ReportCurrentTarget(currentTarget, targetSpeed);
         }
+        
         if(other.CompareTag("Boss"))
         {
-            FinalDuel(bossMouthScript,playerMouthScript,playerBiteMechanicsScript);
+
+            GameObject.FindGameObjectWithTag("Player").GetComponent<CarController>().toggleBrakes();
+            if(playerAnim.gameObject.activeInHierarchy)
+            {
+                playerAnim.Play("MonsterCarBossKill");
+            }
+            FinalDuel(bossMouthScript, playerMouthScript, playerBiteMechanicsScript);
         }
+        
     }
     private void OnTriggerExit(Collider other)
     {
@@ -56,23 +70,37 @@ public class DetectBiteTarget : MonoBehaviour
         if(bossMouth.mouthScore>=playerMouth.mouthScore + biteScript.totalBiteScore)
         {
             playerDestroyed.SetActive(true);
-            playerToDisable.SetActive(false);
-            runCam.Priority = 12;
+            foreach (Renderer r in playerToDisable)
+            {
+                r.enabled = false;
+            }
+            //runCam.Priority = 12;
             bossMouth.CloseMouth();
-            loseScreen.SetActive(true);
 
+            //loseScreen.SetActive(true);
+            playerVictory = false;
+            GameObject.FindGameObjectWithTag("FakeTopMouth").SetActive(false);
+            finalCountDown = true;
         }
         else
         {
             bossDestroyed.SetActive(true);
             bossToDisable.SetActive(false);
-            runCam.Priority = 12;
+            //runCam.Priority = 12;
             playerMouth.CloseMouth();
-            victoryScreen.SetActive(true);
-            playerAnim.enabled = true;
-            playerAnim.Play("MonsterCarBossKill");
+            //victoryScreen.SetActive(true);
+            playerControl.gameObject.transform.GetChild(0).transform.rotation = Quaternion.identity;
+            playerVictory = true;
         }
         bossBattleUI.SetActive(false);
+    }
+
+    public void BossDestroyed()
+    {
+
+        playerControl.toggleBrakes();
+        finalCountDown = true;
+        //victoryScreen.SetActive(true);
     }
 
     public void ReportCurrentTarget(DestructibleVehicle vehicle, float speed)
@@ -89,7 +117,7 @@ public class DetectBiteTarget : MonoBehaviour
         bossDestroyed.SetActive(false);
         playerDestroyed.SetActive(false);
         bossToDisable = GameObject.FindGameObjectWithTag("Boss").transform.GetChild(0).gameObject;
-        playerToDisable = GameObject.FindGameObjectWithTag("Player").transform.GetChild(0).gameObject;
+        playerToDisable = GameObject.FindGameObjectWithTag("Player").GetComponentsInChildren<Renderer>();
         runCam = GameObject.FindGameObjectWithTag("RunCam").GetComponent<CinemachineVirtualCamera>();
         victoryScreen = GameObject.FindGameObjectWithTag("VictoryScreen");
         victoryScreen.SetActive(false);
@@ -98,7 +126,32 @@ public class DetectBiteTarget : MonoBehaviour
         bossBattleUI = GameObject.FindGameObjectWithTag("BossBattleUI");
         bossBattleUI.SetActive(false);
         playerAnim = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Animator>();
+        playerControl = GameObject.FindGameObjectWithTag("Player").GetComponent<CarController>();
     }
 
+    private void Update()
+    {
+        if(finalCountDown)
+        {
+            finalCount -= Time.deltaTime;
+            if(finalCount<=0)
+            {
+                if(playerVictory)
+                {
+                    runCam.Priority = 12;
+                    victoryScreen.SetActive(true);
+                    playerControl.toggleBrakes();
+                    finalCountDown = false;
+                }
+                else
+                {
+                    runCam.Priority = 12;
+                    loseScreen.SetActive(true);
+                    finalCountDown = false;
+                }
+
+            }
+        }
+    }
 
 }

@@ -19,6 +19,8 @@ TagManager:
   - PreCanvas
   - DestructibleCar
   - LevelStartScreen
+  - TopMouth
+  - FakeTopMouth
   layers:
   - Default
   - TransparentFX

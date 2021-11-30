@@ -19,10 +19,15 @@ public class PreBossSetup : MonoBehaviour
 
     float standoffDuration = 4f;
 
+    private void Awake()
+    {
+        allFoodCars = GameObject.FindGameObjectsWithTag("DestructibleCar");
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        allFoodCars = GameObject.FindGameObjectsWithTag("DestructibleCar");
+
         playerCarContr = GameObject.FindGameObjectWithTag("Player").GetComponent<CarController>();
         bossCarContr = GameObject.FindGameObjectWithTag("Boss").GetComponent<CarController>();
         bossBattleCam = GameObject.FindGameObjectWithTag("BossCam").GetComponent<CinemachineVirtualCamera>();
@@ -42,7 +47,6 @@ public class PreBossSetup : MonoBehaviour
 
     public void PreBoss()
     {
-
         levelProgressBar.SetActive(false);
         playerCarContr.SetSpeed(0);
         playerCarContr.gameObject.transform.position = bossBattlePlayerPosition.position;
@@ -50,14 +54,20 @@ public class PreBossSetup : MonoBehaviour
         bossBattleCam.Priority = 11;
         boss.GetComponent<FinalMouthMechanic>().enabled = true;
         player.GetComponent<FinalMouthMechanic>().enabled = true;
-        player.GetComponentInChildren<Animator>().enabled = false;
+        player.GetComponentInChildren<Animator>().enabled = true;
+        player.GetComponentInChildren<Animator>().Play("MonsterCarRoar");
         player.GetComponent<RoadShake>().enabled = false;
+        playerCarContr.toggleBrakes();
+
+        GameObject.FindGameObjectWithTag("TopMouth").SetActive(false);
+        GameObject.FindGameObjectWithTag("FakeTopMouth").SetActive(true);
         isStandoff = true;
     }
 
     public void LaunchBothParties()
     {
         playerCarContr.SetSpeed(10f);
+        playerCarContr.toggleBrakes();
         bossCarContr.SetSpeed(-10f);
     }
 
@@ -71,6 +81,7 @@ public class PreBossSetup : MonoBehaviour
             {
                 LaunchBothParties();
                 isStandoff = false;
+                Debug.Log("attaaaacckk!");
             }
         }
     }
