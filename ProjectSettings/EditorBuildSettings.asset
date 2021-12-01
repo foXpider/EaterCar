@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/RollicScenePlaceholder.unity
-    guid: 7cadd8b729a9efd48b03a129c5569146
+    path: Assets/Elephant/elephant_scene.unity
+    guid: 47a686e3b898646ae802a7832a649176
   - enabled: 1
     path: Assets/Scenes/FoxpiderLoaderScene.unity
     guid: 0043793de5ed19e4cb101c5ff01e686d
