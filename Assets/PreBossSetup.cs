@@ -14,6 +14,8 @@ public class PreBossSetup : MonoBehaviour
     public GameObject boss;
     public GameObject player;
     public GameObject[] allFoodCars;
+    GameObject fakeMouth;
+    GameObject realMouth;
 
     bool isStandoff = false;
 
@@ -34,6 +36,8 @@ public class PreBossSetup : MonoBehaviour
         bossBattlePlayerPosition = GameObject.FindGameObjectWithTag("BossBattlePlayerPos").transform;
         boss = GameObject.FindGameObjectWithTag("Boss");
         player = GameObject.FindGameObjectWithTag("Player");
+        fakeMouth = GameObject.FindGameObjectWithTag("FakeTopMouth");
+        realMouth = GameObject.FindGameObjectWithTag("TopMouth");
     }
 
 
@@ -58,9 +62,8 @@ public class PreBossSetup : MonoBehaviour
         player.GetComponentInChildren<Animator>().Play("MonsterCarRoar");
         player.GetComponent<RoadShake>().enabled = false;
         playerCarContr.toggleBrakes();
-
-        GameObject.FindGameObjectWithTag("TopMouth").SetActive(false);
-        GameObject.FindGameObjectWithTag("FakeTopMouth").SetActive(true);
+        realMouth.SetActive(false);
+        fakeMouth.SetActive(true);
         isStandoff = true;
     }
 
