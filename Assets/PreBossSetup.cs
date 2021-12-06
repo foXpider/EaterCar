@@ -17,6 +17,8 @@ public class PreBossSetup : MonoBehaviour
     GameObject fakeMouth;
     GameObject realMouth;
 
+    FeverMechanics feverScript;
+
     bool isStandoff = false;
 
     float standoffDuration = 4f;
@@ -38,6 +40,8 @@ public class PreBossSetup : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         fakeMouth = GameObject.FindGameObjectWithTag("FakeTopMouth");
         realMouth = GameObject.FindGameObjectWithTag("TopMouth");
+        feverScript = player.GetComponent<FeverMechanics>();
+
     }
 
 
@@ -47,10 +51,13 @@ public class PreBossSetup : MonoBehaviour
         {
             g.SetActive(false);
         }
+        feverScript.EndFever();
+        feverScript.HideFeverUI();
     }
 
     public void PreBoss()
     {
+
         levelProgressBar.SetActive(false);
         playerCarContr.SetSpeed(0);
         playerCarContr.gameObject.transform.position = bossBattlePlayerPosition.position;
@@ -64,7 +71,10 @@ public class PreBossSetup : MonoBehaviour
         playerCarContr.toggleBrakes();
         realMouth.SetActive(false);
         fakeMouth.SetActive(true);
+        feverScript.EndFever();
+        feverScript.HideFeverUI();
         isStandoff = true;
+
     }
 
     public void LaunchBothParties()
@@ -79,6 +89,11 @@ public class PreBossSetup : MonoBehaviour
     {
         if(isStandoff)
         {
+            if(feverScript.isFever)
+            {
+                feverScript.EndFever();
+                feverScript.HideFeverUI();
+            }
             standoffDuration -= Time.deltaTime;
             if(standoffDuration<=0)
             {

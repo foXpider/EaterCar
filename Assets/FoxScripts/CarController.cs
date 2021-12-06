@@ -33,6 +33,8 @@ public class CarController : MonoBehaviour
 
     GameObject fakeMouth;
 
+    bool isFever = false;
+
 
     public void toggleBrakes()
     {
@@ -75,6 +77,22 @@ public class CarController : MonoBehaviour
     public void SetSpeed(float targetSpeed)
     {
         speed = targetSpeed;
+    }
+
+    public void SetFeverModeOn()
+    {
+        isFever = true;
+        speed = 30f;
+        isStalking = false;
+        isSlowDown = false;
+    }
+    public void SetFeverModeOff()
+    {
+        isFever = false;
+        isStalking = false;
+        isSlowDown = false;
+        speed = 20f;
+
     }
 
     //Çiðneme esnasýndaki geçici yavaþlama, bu yavaþlama ile indiðimiz hýzda hiç kalmýyoruz, yavaþça hýzlanýyoruz.
@@ -192,21 +210,30 @@ public class CarController : MonoBehaviour
             {
                 thisTransform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            if (isStalking && !isSlowDown)
+            if(!isFever)
             {
-                thisTransform.Translate(Vector3.forward * stalkSpeed * Time.deltaTime);
-            }
-            if (isSlowDown)
-            {
-                thisTransform.Translate(Vector3.forward * slowSpeed * Time.deltaTime);
-                slowSpeed = slowSpeed + speedStep * Time.deltaTime;
-                //Debug.Log(slowSpeed);
-                if (slowSpeed >= speed)
+                if (isStalking && !isSlowDown)
                 {
-                    isSlowDown = false;
-                    isStalking = false;
+                    thisTransform.Translate(Vector3.forward * stalkSpeed * Time.deltaTime);
                 }
+                if (isSlowDown)
+                {
+                    thisTransform.Translate(Vector3.forward * slowSpeed * Time.deltaTime);
+                    slowSpeed = slowSpeed + speedStep * Time.deltaTime;
+                    //Debug.Log(slowSpeed);
+                    if (slowSpeed >= speed)
+                    {
+                        isSlowDown = false;
+                        isStalking = false;
+                    }
 
+                }
+            }
+            else
+            {
+                isSlowDown = false;
+                isStalking = false;
+                SetSpeed(30);
             }
         }
 

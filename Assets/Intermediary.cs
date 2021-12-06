@@ -8,8 +8,9 @@ public class Intermediary : MonoBehaviour
 
     BiteMechanics biter;
     public CarController playerController;
+    public FinalBossDetector db;
     CinemachineVirtualCamera runCam;
-    public DetectBiteTarget db;
+
 
     public void BiteOtherCar()
     {

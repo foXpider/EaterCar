@@ -49,6 +49,15 @@ public class DestructibleVehicle : MonoBehaviour
         }
     }
 
+    public void EatenInFever()
+    {
+        foreach (GameObject g in carStages)
+        {
+            g.gameObject.SetActive(false);
+        }
+        carStages[carStages.Count-1].gameObject.SetActive(true);
+    }
+
     // Update is called once per frame
     void Update()
     {

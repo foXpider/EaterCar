@@ -21,6 +21,13 @@ TagManager:
   - LevelStartScreen
   - TopMouth
   - FakeTopMouth
+  - SpeedParticles
+  - CarFlames
+  - FeverBar
+  - FeverText
+  - PPV
+  - MouthSlider
+  - BiteAlt
   layers:
   - Default
   - TransparentFX

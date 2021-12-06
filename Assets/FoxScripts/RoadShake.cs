@@ -20,9 +20,9 @@ public class RoadShake : MonoBehaviour
     void Start()
     {
         Vector3 roadshakecurrent = roadShakeTransform.localPosition;
-        Debug.Log(roadShakeTransform.localPosition);
+        //Debug.Log(roadShakeTransform.localPosition);
         skipTarget = Random.Range(roadshakecurrent.y + shakeMinValue, roadshakecurrent.y + shakeMaxValue);
-        Debug.Log(skipTarget);
+        //Debug.Log(skipTarget);
         isSkippingUp = true;
     }
 

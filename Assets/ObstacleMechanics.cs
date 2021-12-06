@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ArionDigital;
+
 
 public class ObstacleMechanics : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class ObstacleMechanics : MonoBehaviour
     public float slowdownDuration;
     public Rigidbody rb;
     public bool hasHit = false;
+    public GameObject puff;
+    public GameObject body;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -17,14 +21,33 @@ public class ObstacleMechanics : MonoBehaviour
             {
                 if(!hasHit)
                 {
-                    other.GetComponent<CarController>().SlowDownForChew(other.GetComponent<CarController>().speed / slowdownDuration, slowdownDuration,2);
-                    if (rb != null)
+                    if(!other.GetComponent<FeverMechanics>().isFever)
                     {
-                        rb.isKinematic = false;
-                        rb.AddForce(new Vector3(Random.Range(-10f, 10f), Random.Range(10f, 20f), Random.Range(10f, 20f)), ForceMode.Impulse);
-                        rb.AddTorque(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)),ForceMode.Impulse);
+                        other.GetComponent<CarController>().SlowDownForChew(other.GetComponent<CarController>().speed / slowdownDuration, slowdownDuration, 2);
+                        other.GetComponent<FeverMechanics>().RemoveFever(10f);
+                        if (rb != null)
+                        {
+                            rb.isKinematic = false;
+                            rb.AddForce(new Vector3(Random.Range(-10f, 10f), Random.Range(10f, 20f), Random.Range(10f, 20f)), ForceMode.Impulse);
+                            rb.AddTorque(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)), ForceMode.Impulse);
+                        }
+                        hasHit = true;
                     }
-                    hasHit = true;
+                    else
+                    {
+                        Debug.Log(other.GetComponent<FeverMechanics>().isFever);
+                        hasHit = true;
+                        //body.SetActive(false);
+                        GetComponent<Renderer>().enabled = false;
+                        GetComponent<Collider>().enabled = false;
+                        puff.SetActive(true);
+                        if(TryGetComponent(out CrashCrate cc))
+                        {
+                            cc.enabled = false;
+                        }
+                        //other.GetComponent<BiteMechanics>().StartGrowth();
+                    }
+
                 }
 
             }

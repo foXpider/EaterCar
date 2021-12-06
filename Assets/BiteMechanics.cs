@@ -11,6 +11,7 @@ public class BiteMechanics : MonoBehaviour
     float biteTargetSpeed;
     bool isTargetStillInFrontForBite = true;
     Vector3 lastGoodScale;
+    FeverMechanics feverScript;
 
     public AnimationCurve scalarCurve;
     float scalarTime = 0f;
@@ -18,22 +19,48 @@ public class BiteMechanics : MonoBehaviour
 
     public int totalBiteScore = 0;
 
+    bool isFever = false;
+
+    public void SetFeverOn()
+    {
+        isFever = true;
+    }
+    public void SetFeverOff()
+    {
+        isFever = false;
+    }
+
+    public void FeverBite()
+    {
+        if(isFever)
+        {
+            targetVehicle.EatenInFever();
+            StartGrowth();
+
+        }
+    }
+
 
     //bu fonksiyon animasyon üzerindeki bir trigger ile çaðrýlýyor ve parçalanma sekansýný baþlatýyor. Transition'a dikkat.
     public void BiteOtherCar()
     {
-        if(isTargetStillInFrontForBite)
+        if(!isFever)
         {
-            targetVehicle.ProceedToNextStage();
-            controller.SlowDownForChew(biteTargetSpeed,0.33f,3);
-            StartGrowth();
-            totalBiteScore++;
+            if (isTargetStillInFrontForBite)
+            {
+                targetVehicle.ProceedToNextStage();
+                controller.SlowDownForChew(biteTargetSpeed, 0.33f, 3);
+                StartGrowth();
+                feverScript.AddFever(20);
+                totalBiteScore++;
+            }
+            else
+            {
+                CancelBiteAnimation();
+                controller.ReturnToCruise();
+            }
         }
-        else
-        {
-            CancelBiteAnimation();
-            controller.ReturnToCruise();
-        }
+
     }
 
     //bu fonksiyonu aracýn önüne takýlý görünmez gameobject'in colliderý trigger olunca oradaki DetectBiteTarget script'i çaðýrýyor.
@@ -44,6 +71,19 @@ public class BiteMechanics : MonoBehaviour
         biteTargetSpeed = speed;
         controller.SetStalkSpeed(biteTargetSpeed);
         anim.Play("NewMonsterCarBite");
+    }
+
+    public void CheckForStay(DestructibleVehicle stayTarget)
+    {
+        if(targetVehicle!=null)
+        {
+            if(stayTarget == targetVehicle)
+            {
+                isTargetStillInFrontForBite = true;
+                //controller.SetStalkSpeed(biteTargetSpeed);
+                anim.Play("NewMonsterCarBite");
+            }
+        }
     }
 
     public void StartGrowth()
@@ -68,6 +108,7 @@ public class BiteMechanics : MonoBehaviour
     {
         anim = GetComponentInChildren<Animator>();
         controller = GetComponent<CarController>();
+        feverScript = GetComponent<FeverMechanics>();
     }
 
     // Update is called once per frame

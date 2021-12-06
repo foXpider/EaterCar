@@ -4,7 +4,7 @@ using UnityEngine;
 using Cinemachine;
 
 
-public class DetectBiteTarget : MonoBehaviour
+public class FinalBossDetector : MonoBehaviour
 {
     public BiteMechanics biteScript;
     DestructibleVehicle currentTarget;
@@ -39,52 +39,81 @@ public class DetectBiteTarget : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("FoodCar"))
+
+        if (other.CompareTag("Boss"))
         {
 
-            currentTarget = other.transform.root.GetComponent<DestructibleVehicle>();
-            targetSpeed = other.transform.root.GetComponent<CarController>().speed;
-            ReportCurrentTarget(currentTarget, targetSpeed);
+            GameObject.FindGameObjectWithTag("Player").GetComponent<CarController>().toggleBrakes();
+            if (playerAnim.gameObject.activeInHierarchy)
+            {
+                playerAnim.Play("MonsterCarBossKill");
+            }
+            FinalDuel(bossMouthScript, playerMouthScript, playerBiteMechanicsScript);
 
         }
-        
-        
+
     }
-    private void OnTriggerExit(Collider other)
+
+
+    public void FinalDuel(FinalMouthMechanic bossMouth, FinalMouthMechanic playerMouth, BiteMechanics playerBiter)
     {
-        if (other.CompareTag("FoodCar"))
+
+        if (bossMouth.mouthScore >= playerMouth.mouthScore + biteScript.totalBiteScore)
         {
-            biteScript.TargetAway();
+            playerDestroyed.SetActive(true);
+            foreach (Renderer r in playerToDisable)
+            {
+                r.enabled = false;
+            }
+            //runCam.Priority = 12;
+            bossMouth.CloseMouth();
+
+            //loseScreen.SetActive(true);
+            playerVictory = false;
+            GameObject.FindGameObjectWithTag("FakeTopMouth").SetActive(false);
+            finalCountDown = true;
         }
+        else
+        {
+            bossDestroyed.SetActive(true);
+            bossToDisable.SetActive(false);
+            //runCam.Priority = 12;
+            playerMouth.CloseMouth();
+            //victoryScreen.SetActive(true);
+            playerControl.gameObject.transform.GetChild(0).transform.rotation = Quaternion.identity;
+            playerVictory = true;
+        }
+        bossBattleUI.SetActive(false);
+
     }
 
-    
-
-
-
-    public void ReportCurrentTarget(DestructibleVehicle vehicle, float speed)
+    public void BossDestroyed()
     {
-        biteScript.SetTargetCar(vehicle, speed);
-        biteScript.FeverBite();
+
+        playerControl.toggleBrakes();
+        finalCountDown = true;
+        //victoryScreen.SetActive(true);
+
     }
+
 
     private void Start()
     {
         playerMouthScript = GameObject.FindGameObjectWithTag("Player").GetComponent<FinalMouthMechanic>();
         bossMouthScript = GameObject.FindGameObjectWithTag("Boss").GetComponent<FinalMouthMechanic>();
         playerBiteMechanicsScript = GameObject.FindGameObjectWithTag("Player").GetComponent<BiteMechanics>();
-        //bossDestroyed = GameObject.FindGameObjectWithTag("BossExplosion");
-        //bossDestroyed.SetActive(false);
+        bossDestroyed = GameObject.FindGameObjectWithTag("BossExplosion");
+        bossDestroyed.SetActive(false);
         playerDestroyed.SetActive(false);
         bossToDisable = GameObject.FindGameObjectWithTag("Boss").transform.GetChild(0).gameObject;
         playerToDisable = GameObject.FindGameObjectWithTag("Player").GetComponentsInChildren<Renderer>();
         runCam = GameObject.FindGameObjectWithTag("RunCam").GetComponent<CinemachineVirtualCamera>();
         victoryScreen = GameObject.FindGameObjectWithTag("VictoryScreen");
-        //victoryScreen.SetActive(false);
+        victoryScreen.SetActive(false);
         loseScreen = GameObject.FindGameObjectWithTag("LoseScreen");
-        //loseScreen.SetActive(false);
+        loseScreen.SetActive(false);
         bossBattleUI = GameObject.FindGameObjectWithTag("BossBattleUI");
-        //bossBattleUI.SetActive(false);
+        bossBattleUI.SetActive(false);
         playerAnim = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Animator>();
         playerControl = GameObject.FindGameObjectWithTag("Player").GetComponent<CarController>();
 
@@ -92,13 +121,12 @@ public class DetectBiteTarget : MonoBehaviour
 
     private void Update()
     {
-        /*
-        if(finalCountDown)
+        if (finalCountDown)
         {
             finalCount -= Time.deltaTime;
-            if(finalCount<=0)
+            if (finalCount <= 0)
             {
-                if(playerVictory)
+                if (playerVictory)
                 {
                     runCam.Priority = 12;
                     victoryScreen.SetActive(true);
@@ -114,7 +142,6 @@ public class DetectBiteTarget : MonoBehaviour
 
             }
         }
-        */
     }
 
 }

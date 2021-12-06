@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using MoreMountains.NiceVibrations;
 
 public class FinalMouthMechanic : MonoBehaviour
 {
@@ -23,6 +25,10 @@ public class FinalMouthMechanic : MonoBehaviour
     public float mouthScore;
 
 
+    Slider mouthSlider;
+
+
+
     public bool isPlayer = false;
 
     public bool isGameOver = false;
@@ -40,17 +46,28 @@ public class FinalMouthMechanic : MonoBehaviour
         {
             fakeMouth.SetActive(false);
         }
+
+        mouthSlider = GameObject.FindGameObjectWithTag("MouthSlider").GetComponent<Slider>();
     }
 
     public void MouthPieceDecline()
     {
         mouthPiece.rotation = Quaternion.RotateTowards(mouthPiece.rotation, mouthStartRotation, declineSpeed);
+        if(isPlayer)
+        {
+            mouthSlider.value -= declineSpeed*2;
+        }
     }
     
     public void MouthJolt()
     {
         timeSinceLastJolt = 0;
         mouthPiece.rotation = Quaternion.RotateTowards(mouthPiece.rotation, mouthFullOpenRotation, joltPerTouch);
+        MMVibrationManager.Haptic(HapticTypes.LightImpact);
+        if(isPlayer)
+        {
+            mouthSlider.value += joltPerTouch;
+        }
     }
     
     public void CloseMouth()
